@@ -15,19 +15,23 @@ X_train, Y_train, X_test, Y_test = fetch_mnist()
 # create a model
 class MiniNet:
     def __init__(self):
-        self.l1 = Tensor(layer_init_uniform(784, 128))
-        self.l2 = Tensor(layer_init_uniform(128, 10))
+        self.l1 = Tensor(layer_init_uniform(784, 200))
+        self.l2 = Tensor(layer_init_uniform(200, 25))
+        self.l3 = Tensor(layer_init_uniform(25, 10))
 
     def forward(self, x):
-        return x.dot(self.l1).relu().dot(self.l2).logsoftmax()
+        x = x.dot(self.l1).relu()
+        x = x.dot(self.l2).relu()
+        x = x.dot(self.l3).logsoftmax()
+        return x
 
 model = MiniNet()
-optim = optim.SGD([model.l1, model.l2], lr=0.001)
+optim = optim.SGD([model.l1, model.l2, model.l3], lr=1e-2)
 
 batch_size = 128
 losses, accuracies = [], []
 
-for i in (t:= trange(10000)):
+for i in (t:= trange(3000)):
     sample = np.random.randint(0, X_train.shape[0], size=(batch_size))
 
     x = Tensor(X_train[sample].reshape(-1, 28*28))
